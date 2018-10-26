@@ -2,6 +2,7 @@ const imageDir = 'images/';
 
 var disableMap = false;
 var currentGeneralLocation = '';
+var currentDetailedLocation = '';
 var currentLocationIsDungeon = false;
 var showNonProgressLocations = false;
 var singleColorBackground = false;
@@ -279,7 +280,27 @@ function toggleItem(itemName, maxItems) {
         curCount = 0;
     }
     items[itemName] = curCount;
+    if (curCount > 0) {
+        setItemToLocation(itemName);
+    }
     dataChanged();
+}
+
+function setItemToLocation(itemName) {
+    if (currentGeneralLocation && currentDetailedLocation) {
+        itemsForLocations[currentGeneralLocation][currentDetailedLocation] = itemName;
+        $.notify(itemName + " at " + currentDetailedLocation, {
+            autoHideDelay: 5000,
+            className: 'success',
+            position: 'bottom left'
+        });
+    } else {
+        $.notify("Could not set " + itemName, {
+            autoHideDelay: 5000,
+            className: 'error',
+            position: 'bottom left'
+        });
+    }
 }
 
 function toggleKey(element, maxKeys, dungeonIndex) {
@@ -291,6 +312,9 @@ function toggleKey(element, maxKeys, dungeonIndex) {
         keyCount = 0;
     }
     keys[keyName] = keyCount;
+    if (keyCount > 0) {
+        setItemToLocation(keyName);
+    }
     dataChanged();
     if (keyName.includes('Small')) {
         smallKeyInfo(element, maxKeys);
@@ -386,14 +410,32 @@ function setTooltipText(generalLocation, detailedLocation) {
     $('.tool-tip-text').html(list.outerHTML);
 }
 
+function getLocationName(element) {
+    return element.innerText.substring(element.innerText.indexOf(" ") + 1)
+}
+
 function addTooltipToElement(element) {
-    var detailedLocation = element.innerText;
+    var detailedLocation = getLocationName(element);
     if (!locationsChecked[currentGeneralLocation][detailedLocation]) {
         setTooltipText(currentGeneralLocation, detailedLocation);
         $(element).qtip({
             content: {
                 text: $('.tool-tip-text').clone(),
                 title: 'Items Required'
+            },
+            position: {
+                target: 'mouse',
+                adjust: {
+                    x: 15
+                }
+            }
+        });
+    } else if (itemsForLocations[currentGeneralLocation][detailedLocation]) {
+        $('.tool-tip-text').html('');
+        $(element).qtip({
+            content: {
+                text: $('.tool-tip-text').clone(),
+                title: itemsForLocations[currentGeneralLocation][detailedLocation]
             },
             position: {
                 target: 'mouse',
@@ -498,7 +540,7 @@ function toggleMap(index, isDungeon) {
         var element = document.getElementById(l);
         if (i < detailedLocations.length) {
             element.style.display = 'block';
-            element.innerText = detailedLocations[i];
+            element.innerText = "[" + spheres[currentGeneralLocation][detailedLocations[i]] + "] " + detailedLocations[i];
             element.classList.remove('detail-small');
             element.classList.remove('detail-smallest');
             if (fontSize == 'small') {
@@ -523,7 +565,7 @@ function refreshLocationColors() {
     for (var i = 0; i < 36; i++) {
         var l = 'detaillocation' + i.toString();
         var element = document.getElementById(l);
-        var detailedLocation = element.innerText;
+        var detailedLocation = getLocationName(element);
         if (locationsChecked[currentGeneralLocation][detailedLocation]) {
             setElementColor(element, 'black-text');
             element.style.setProperty('text-decoration', 'line-through');
@@ -543,8 +585,13 @@ function refreshLocationColors() {
 }
 
 function toggleLocation(element) {
-    var detailedLocation = element.innerText;
+    var detailedLocation = getLocationName(element);
     var newLocationChecked = !locationsChecked[currentGeneralLocation][detailedLocation];
+    if (newLocationChecked) {
+        currentDetailedLocation = detailedLocation;
+    } else {
+        itemsForLocations[currentGeneralLocation][detailedLocation] = "";
+    }
     locationsChecked[currentGeneralLocation][detailedLocation] = newLocationChecked;
     dataChanged();
 }

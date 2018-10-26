@@ -22,7 +22,7 @@ function setGuaranteedKeysForDungeon(dungeonName, shortDungeonName) {
     var bigKeyName = shortDungeonName + ' Big Key';
     items[smallKeyName] = Math.max(guaranteedKeys.small, keys[smallKeyName]);
     items[bigKeyName] = Math.max(guaranteedKeys.big, keys[bigKeyName]);
-    locationsAreAvailable = setLocations(isLocationAvailable);
+    locationsAreAvailable = setLocations(isLocationAvailable, items);
 }
 
 // guaranteed keys are the minimum keys required to access any location that is blocked by non-key requirements

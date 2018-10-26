@@ -19,13 +19,17 @@ function setLocationsAreAvailable() {
         locationsAreAvailable = setLocations(() => true);
     } else {
         transferKeys();
-        locationsAreAvailable = setLocations(isLocationAvailable);
+        locationsAreAvailable = setLocations(isLocationAvailable, items);
         setGuaranteedKeys();
     }
 }
 
 function initializeLocationsChecked() {
     locationsChecked = setLocations(() => false);
+}
+
+function initializeItemsForLocations() {
+    itemsForLocations = setLocations(() => "");
 }
 
 function isValidForLocation(generalLocation, detailedLocation, isDungeon) {
@@ -77,35 +81,35 @@ function getChestCountsForLocation(generalLocation, isDungeon) {
     };
 }
 
-function setLocations(valueCallback) {
+function setLocations(valueCallback, itemSet) {
     result = {};
-    Object.keys(itemLocations).forEach(function (locationName) {
+    Object.keys(itemLocations).forEach((locationName) => {
         var split = locationName.indexOf(' - ');
         var generalLocation = locationName.substring(0, split);
         var detailedLocation = locationName.substring(split + 3);
         if (!(generalLocation in result)) {
             result[generalLocation] = {};
         }
-        var locationValue = valueCallback(locationName);
+        var locationValue = valueCallback(locationName, itemSet);
         result[generalLocation][detailedLocation] = locationValue;
     });
     return result;
 }
 
-function checkRequirementMet(reqName) {
+function checkRequirementMet(reqName, itemSet) {
     if (isProgressiveRequirement(reqName)) {
-        return checkProgressiveItemRequirementRemaining(reqName, items) <= 0;
+        return checkProgressiveItemRequirementRemaining(reqName, itemSet) <= 0;
     }
     if (reqName.startsWith('Can Access Other Location "')) {
-        return checkOtherLocationReq(reqName);
+        return checkOtherLocationReq(reqName, itemSet);
     }
-    if (reqName in items) {
-        return items[reqName] > 0;
+    if (reqName in itemSet) {
+        return itemSet[reqName] > 0;
     }
     if (reqName in macros) {
         var macro = macros[reqName];
         var splitExpression = getSplitExpression(macro);
-        return checkLogicalExpressionReq(splitExpression);
+        return checkLogicalExpressionReq(splitExpression, itemSet);
     }
     if (reqName == 'Nothing') {
         return true;
@@ -140,17 +144,17 @@ function getProgressiveRequirementName(itemName, numRequired) {
     return `${itemName} x${numRequired}`;
 }
 
-function checkOtherLocationReq(reqName) {
+function checkOtherLocationReq(reqName, itemSet) {
     var otherLocation = reqName.substring('Can Access Other Location "'.length, reqName.length - 1);
     var splitExpression = getSplitExpression(itemLocations[otherLocation].Need)
-    return checkLogicalExpressionReq(splitExpression);
+    return checkLogicalExpressionReq(splitExpression, itemSet);
 }
 
 function getSplitExpression(expression) {
     return expression.split(/\s*([(&\|)])\s*/g);
 }
 
-function checkLogicalExpressionReq(splitExpression) {
+function checkLogicalExpressionReq(splitExpression, itemSet) {
     var expressionType = '';
     var subexpressionResults = [];
     while (splitExpression.length > 0) {
@@ -162,12 +166,12 @@ function checkLogicalExpressionReq(splitExpression) {
             } else if (cur == '&') {
                 expressionType = 'AND';
             } else if (cur == '(') {
-                var result = checkLogicalExpressionReq(splitExpression);
+                var result = checkLogicalExpressionReq(splitExpression, itemSet);
                 subexpressionResults.push(result);
             } else if (cur == ')') {
                 break;
             } else {
-                result = checkRequirementMet(cur);
+                result = checkRequirementMet(cur, itemSet);
                 subexpressionResults.push(result);
             }
         }
@@ -178,9 +182,9 @@ function checkLogicalExpressionReq(splitExpression) {
     return subexpressionResults.every(element => element);
 }
 
-function isLocationAvailable(locationName) {
+function isLocationAvailable(locationName, itemSet) {
     var splitExpression = getSplitExpression(itemLocations[locationName].Need)
-    return checkLogicalExpressionReq(splitExpression);
+    return checkLogicalExpressionReq(splitExpression, itemSet);
 }
 
 function isLocationProgress(locationName) {

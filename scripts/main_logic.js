@@ -277,6 +277,8 @@ var startingTriforceShards = 0;
 // tracker should use these without modifying them
 var locationsAreProgress = {};
 var locationsAreAvailable = {};
+var itemsForLocations = {};
+var spheres = {};
 
 $(document).ready(function () {
     loadFlags();
@@ -326,6 +328,7 @@ function afterLoad() {
         updateMacrosAndLocations();
         setLocationsAreProgress();
         initializeLocationsChecked();
+        initializeItemsForLocations();
         loadProgress();
         dataChanged();
     }
@@ -338,6 +341,7 @@ function dataChanged() {
     refreshLocationColors();
     recreateTooltips();
     updateStatistics();
+    calculateSpheres();
 }
 
 function loadStartingItems() {
@@ -442,6 +446,7 @@ function incrementShield() {
         items["Hero's Shield"] = 1;
     } else if (items['Mirror Shield'] == 0) {
         items['Mirror Shield'] = 1;
+        setItemToLocation('Mirror Shield');
     } else {
         items["Hero's Shield"] = 0;
         items['Mirror Shield'] = 0;
