@@ -35,6 +35,7 @@ function calculateSpheres() {
         Object.keys(tempItems).forEach(function (item) {
             newTempItems[item] = tempItems[item];
         });
+        setGuaranteedKeys(tempItems, newTempItems);
         Object.keys(itemLocations).forEach((locationName) => {
             var split = locationName.indexOf(' - ');
             var generalLocation = locationName.substring(0, split);
@@ -46,11 +47,11 @@ function calculateSpheres() {
                 newTempItems[itemsForLocations[generalLocation][detailedLocation]] += 1;
             }
         });
+        Object.keys(tempItems).forEach((itemName) => {
+            tempItems[itemName] = Math.max(tempItems[itemName], newTempItems[itemName]);
+        });
         curSphere += 1;
-        tempItems = newTempItems;
     }
-
-    setMissingSpheres();
 
     if (currentGeneralLocation) {
         var detailedLocations = getDetailedLocations(currentGeneralLocation, currentLocationIsDungeon);
@@ -62,30 +63,4 @@ function calculateSpheres() {
             }
         }
     }
-}
-
-function setMissingSpheres() {
-    if (!isKeyLunacy) {
-        for (var i = 0; i < dungeons.length; i++) {
-            var dungeonName = dungeons[i];
-            if (isMainDungeon(dungeonName)) {
-                setMissingSpheresForDungeon(dungeonName);
-            }
-        }
-    }
-}
-
-function setMissingSpheresForDungeon(dungeonName) {
-    var maxSphere = 0;
-    Object.keys(locationsAreAvailable[dungeonName]).forEach(function (detailedLocation) {
-        if (locationsAreAvailable[dungeonName][detailedLocation]) {
-            maxSphere = Math.max(maxSphere, spheres[dungeonName][detailedLocation]);
-        }
-    });
-    Object.keys(locationsAreAvailable[dungeonName]).forEach(function (detailedLocation) {
-        if (locationsAreAvailable[dungeonName][detailedLocation]
-            && spheres[dungeonName][detailedLocation] == 0) {
-            spheres[dungeonName][detailedLocation] = maxSphere;
-        }
-    });
 }

@@ -20,7 +20,7 @@ function setLocationsAreAvailable() {
     } else {
         transferKeys();
         locationsAreAvailable = setLocations(isLocationAvailable, items);
-        setGuaranteedKeys();
+        setGuaranteedKeys(items, keys);
     }
 }
 

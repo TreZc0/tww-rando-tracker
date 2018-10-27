@@ -379,7 +379,7 @@ function getTextForExpression(expression, isParentExprTrue) {
 }
 
 function setTooltipText(generalLocation, detailedLocation) {
-    var itemsRequiredExpr = itemsRequiredForLocation(generalLocation, detailedLocation);
+    var itemsRequiredExpr = itemsRequiredForLocation(items, generalLocation, detailedLocation);
     if (!itemsRequiredExpr || !itemsRequiredExpr.items || itemsRequiredExpr.items == 'None') {
         var element = document.createElement('span');
         element.innerText = 'None';
