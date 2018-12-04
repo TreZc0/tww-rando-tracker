@@ -163,6 +163,28 @@ function refreshAllImagesAndCounts() {
                 document.getElementById(l).style.backgroundImage = 'url(\'' + imageDir + 'bosskey_a.png\')';
             }
         }
+
+        if (dungeons[i] != "Ganon's Tower") {
+            // maps
+            var l = 'dungeonmap' + i.toString();
+            var mapName = document.getElementById(l).innerText;
+            var mapCount = items[mapName];
+            if (mapCount === 0) {
+                document.getElementById(l).style.backgroundImage = 'url(\'' + imageDir + 'map.png\')';
+            } else {
+                document.getElementById(l).style.backgroundImage = 'url(\'' + imageDir + 'map_a.png\')';
+            }
+
+            // compasses
+            var l = 'compass' + i.toString();
+            var compassName = document.getElementById(l).innerText;
+            var compassCount = items[compassName];
+            if (compassCount === 0) {
+                document.getElementById(l).style.backgroundImage = 'url(\'' + imageDir + 'compass.png\')';
+            } else {
+                document.getElementById(l).style.backgroundImage = 'url(\'' + imageDir + 'compass_a.png\')';
+            }
+        }
     }
 
     // charts

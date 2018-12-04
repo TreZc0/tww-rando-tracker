@@ -533,8 +533,8 @@ legend {
 .extra-locations {
     float: left;
     background-color: rgba(160, 160, 160, 0.85);
-    width: 450px;
-    height: 242px;
+    width: 690px;
+    height: 266px;
     margin-right: 8px;
     margin-bottom: 8px;
 }
@@ -544,7 +544,7 @@ legend {
 }
 
 .extra-location {
-    width: 80px;
+    width: 128px;
     float: left;
     background-position-y: 15px;
     display: flex;
@@ -586,6 +586,7 @@ legend {
 
 .dungeon-icon {
     display: flex;
+    justify-content: center;
 }
 
 .statistics {
