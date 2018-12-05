@@ -1,4 +1,6 @@
 function calculateSpheres() {
+    previousLocations = locationsAreAvailable;
+
     tempItems = {};
     Object.keys(items).forEach(function (item) {
         tempItems[item] = 0;
@@ -63,4 +65,6 @@ function calculateSpheres() {
             }
         }
     }
+
+    locationsAreAvailable = previousLocations;
 }
